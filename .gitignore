@@ -1,11 +1,33 @@
+# Local virtual environments
 .venv/
 .venv-1/
 tf1env/
+shufflenet-v2-tensorflow/venv/
+
+# Editor / OS metadata
 .vscode/
+**/.DS_Store
+
+# Python cache
 **/__pycache__/
 **/*.pyc
-**/.DS_Store
-shufflenet-v2-tensorflow/venv/
-shufflenet-v2-tensorflow-git-backup-*/
-.git-nested-backup-*/
+**/.ipynb_checkpoints/
+
+# Backup folders created during git migration/reset
 .git-root-backup-*/
+.git-nested-backup-*/
+shufflenet-v2-tensorflow-git-backup-*/
+
+# Large generated outputs for future experiment runs
+# Note: already tracked files remain tracked.
+*.zip
+checkpoints_*/**/tensorboard/
+checkpoints_*/**/logs/
+checkpoints_*/**/events.out.tfevents*
+checkpoints_*/**/*.tmp
+checkpoints_*/**/*.bak
+artifacts/**/tmp/
+artifacts/**/cache/
+artifacts/**/runs/
+artifacts/**/*.npy
+artifacts/**/*.npz
