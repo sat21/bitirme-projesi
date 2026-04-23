@@ -1,0 +1,14 @@
+Experiment,TransferLearning,DataAugmentation,Epochs,BestValAcc,Accuracy,Precision_Weighted,Recall_Weighted,F1_Weighted,Precision_Macro,Recall_Macro,F1_Macro,SourceTestFile
+checkpoints_tomato_1_5x_baseline,DISABLED,DISABLED,50,0.9810022115707396,0.997247,0.997245,0.997247,0.997243,0.996583,0.995631,0.996102,shufflenet-v2-tensorflow/checkpoints_tomato_1_5x_baseline/test_results.csv
+checkpoints_tomato_2_0x_baseline,DISABLED,DISABLED,50,0.9961453676223756,0.996145,0.996147,0.996145,0.996138,0.99526,0.994471,0.994851,shufflenet-v2-tensorflow/checkpoints_tomato_2_0x_baseline/test_results.csv
+checkpoints_tomato_baseline,DISABLED,DISABLED,50,0.975220263004303,0.995595,0.995616,0.995595,0.995596,0.99419,0.99393,0.994045,shufflenet-v2-tensorflow/checkpoints_tomato_baseline/test_results.csv
+checkpoints_tomato_2_0x_aug,DISABLED,DISABLED,50,0.9920154213905334,0.992015,0.992009,0.992015,0.991988,0.990256,0.988034,0.989102,checkpoints_tomato_2_0x_aug/test_results.csv
+checkpoints_tomato_1_5x_aug,DISABLED,DISABLED,50,0.9909141063690186,0.990914,0.99091,0.990914,0.990897,0.989082,0.986951,0.987995,checkpoints_tomato_1_5x_aug/test_results.csv
+checkpoints_tomato_1_0x_aug,DISABLED,DISABLED,50,0.9851321578025818,0.985132,0.985104,0.985132,0.985078,0.982723,0.979387,0.980988,checkpoints_tomato_1_0x_aug/test_results.csv
+checkpoints_tomato_0_5x_aug,DISABLED,DISABLED,50,0.982929527759552,0.98293,0.983015,0.98293,0.982929,0.977636,0.976533,0.977021,checkpoints_tomato_0_5x_aug/test_results.csv
+checkpoints_tomato_0_5x_baseline,DISABLED,DISABLED,50,0.9749449491500854,0.974945,0.975046,0.974945,0.974927,0.966647,0.964657,0.965542,shufflenet-v2-tensorflow/checkpoints_tomato_0_5x_baseline/test_results.csv
+checkpoints_tomato_0_5x_transfer,DISABLED,DISABLED,50,0.9306167364120485,0.930617,0.931128,0.930617,0.930685,0.911462,0.909975,0.91043,checkpoints_tomato_0_5x_transfer/test_results.csv
+checkpoints_tomato_1_0x_transfer_gpu,ENABLED,DISABLED,50,0.9316239356994628,0.812775,0.856873,0.812775,0.807791,0.808408,0.779041,0.755873,checkpoints_tomato_1_0x_transfer_gpu/test_results.csv
+checkpoints_tomato_1_0x_transfer,ENABLED,DISABLED,38,0.932726800441742,0.799009,0.847088,0.799009,0.791688,0.797811,0.764821,0.739455,checkpoints_tomato_1_0x_transfer/test_results.csv
+checkpoints_tomato_2_0x_transfer_gpu_noaug,ENABLED,DISABLED,50,0.2952853739261627,0.2883,0.0831,0.2883,0.129,0.0288,0.1,0.0448,checkpoints_tomato_2_0x_transfer_gpu_noaug/test_results.csv
+checkpoints_tomato_1_5x_transfer_gpu_noaug,ENABLED,DISABLED,50,0.2952853739261627,0.288271,0.0831,0.288271,0.12901,0.028827,0.1,0.044753,checkpoints_tomato_1_5x_transfer_gpu_noaug/test_results.csv

@@ -1,0 +1,59 @@
+{
+  "image": "/tmp/tomatech_cmp_zucx06wn/downloaded.jpg",
+  "keras_topk": [
+    {
+      "label": "Tomato___Septoria_leaf_spot",
+      "confidence": 0.9998855725170336
+    },
+    {
+      "label": "Tomato___Bacterial_spot",
+      "confidence": 0.00011439258223481278
+    },
+    {
+      "label": "Tomato___Late_blight",
+      "confidence": 3.478411010914801e-08
+    },
+    {
+      "label": "Tomato___Leaf_Mold",
+      "confidence": 9.849308130184083e-11
+    },
+    {
+      "label": "Tomato___Early_blight",
+      "confidence": 9.532149500207651e-12
+    }
+  ],
+  "tflite_topk": [
+    {
+      "label": "Tomato___Septoria_leaf_spot",
+      "confidence": 0.9999049575742666
+    },
+    {
+      "label": "Tomato___Bacterial_spot",
+      "confidence": 9.49715669682873e-05
+    },
+    {
+      "label": "Tomato___Late_blight",
+      "confidence": 7.064602747619629e-08
+    },
+    {
+      "label": "Tomato___Leaf_Mold",
+      "confidence": 1.7458192274207271e-10
+    },
+    {
+      "label": "Tomato___Early_blight",
+      "confidence": 2.646236758404194e-11
+    }
+  ],
+  "keras_decision": {
+    "status": "DIAGNOSIS",
+    "top1_confidence": 0.9998855725170336,
+    "margin": 0.9997711799347988
+  },
+  "tflite_decision": {
+    "status": "DIAGNOSIS",
+    "top1_confidence": 0.9999049575742666,
+    "margin": 0.9998099860072983
+  },
+  "top1_same": true,
+  "probability_l1_distance": 3.884203053309141e-05
+}

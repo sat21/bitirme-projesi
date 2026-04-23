@@ -1,0 +1,9 @@
+{
+  "keras_model": "/mnt/021630F41630E9F5/PROJECTS/torch/shufflenet-v2-tensorflow/checkpoints_tomato_1_5x_baseline/best_model.keras",
+  "tflite_model": "/mnt/021630F41630E9F5/PROJECTS/torch/shufflenet-v2-tensorflow/artifacts/tflite/checkpoints_tomato_1_5x_baseline_best_model_fp16.tflite",
+  "labels": "/mnt/021630F41630E9F5/PROJECTS/torch/shufflenet-v2-tensorflow/artifacts/tflite/labels_tomato_10.txt",
+  "quantization": "fp16",
+  "image_size": 224,
+  "num_classes": 10,
+  "normalize": "(x/255 - 0.5) / 0.5"
+}

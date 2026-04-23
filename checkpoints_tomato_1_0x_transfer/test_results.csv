@@ -1,0 +1,41 @@
+ShuffleNet V2 1.0x_transfer Baseline Test Results
+Date,2026-01-27 02:42:24
+Transfer Learning,ENABLED
+Data Augmentation,DISABLED
+Total Test Samples,3632
+
+=== OVERALL METRICS ===
+Metric,Value
+Accuracy,0.799009
+Precision (Weighted),0.847088
+Recall (Weighted),0.799009
+F1-Score (Weighted),0.791688
+Precision (Macro),0.797811
+Recall (Macro),0.764821
+F1-Score (Macro),0.739455
+
+=== PER-CLASS METRICS ===
+Class,Accuracy,Precision,Recall,F1-Score,Support
+Bacterial_spot,0.413551,0.977901,0.413551,0.581281,428
+Early_blight,0.889503,0.427056,0.889503,0.577061,181
+Late_blight,0.806011,0.967213,0.806011,0.879285,366
+Leaf_Mold,0.319372,0.910448,0.319372,0.472868,191
+Septoria_leaf_spot,0.890374,0.671371,0.890374,0.765517,374
+Spider_mites,0.940299,0.750000,0.940299,0.834437,335
+Target_Spot,0.754386,0.693548,0.754386,0.722689,285
+Yellow_Leaf_Curl,0.982808,0.923698,0.982808,0.952337,1047
+Mosaic_virus,0.965517,0.694215,0.965517,0.807692,87
+Healthy,0.686391,0.962656,0.686391,0.801382,338
+
+=== CONFUSION MATRIX ===
+,Bacterial_spot,Early_blight,Late_blight,Leaf_Mold,Septoria_leaf_spot,Spider_mites,Target_Spot,Yellow_Leaf_Curl,Mosaic_virus,Healthy
+Bacterial_spot,177,90,0,5,87,5,29,32,0,3
+Early_blight,0,161,2,0,6,3,3,4,2,0
+Late_blight,2,46,295,1,7,4,3,6,2,0
+Leaf_Mold,0,28,2,61,31,11,10,18,28,2
+Septoria_leaf_spot,0,20,4,0,333,0,8,6,3,0
+Spider_mites,0,3,0,0,4,315,7,5,0,1
+Target_Spot,0,18,0,0,11,29,215,9,0,3
+Yellow_Leaf_Curl,1,3,1,0,12,0,1,1029,0,0
+Mosaic_virus,0,1,0,0,1,1,0,0,84,0
+Healthy,1,7,1,0,4,52,34,5,2,232

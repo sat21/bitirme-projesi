@@ -1,0 +1,9 @@
+"""
+ShuffleNet V2 0.5x Transfer Learning Test Config
+"""
+
+# test_unified.py scriptinde 0.5x transfer learning için test eklemek için
+# checkpoint ve output klasörü: checkpoints_tomato_0_5x_transfer
+# model_path: ./checkpoints_tomato_0_5x_transfer/best_model.keras
+# output_dir: ./checkpoints_tomato_0_5x_transfer
+# model_scale: 0.5

@@ -1,0 +1,31 @@
+metric,value
+sample_count,300
+keras_accuracy,0.996667
+tflite_accuracy,0.996667
+accuracy_gap_abs,0.000000
+keras_tflite_agreement,1.000000
+mismatch_count,0
+tflite_model_size_mb,2.7286
+tflite_latency_avg_ms,3.111
+tflite_latency_p50_ms,2.997
+tflite_latency_p95_ms,3.773
+keras_class_acc::Tomato___Bacterial_spot,1.000000
+tflite_class_acc::Tomato___Bacterial_spot,1.000000
+keras_class_acc::Tomato___Early_blight,1.000000
+tflite_class_acc::Tomato___Early_blight,1.000000
+keras_class_acc::Tomato___Late_blight,1.000000
+tflite_class_acc::Tomato___Late_blight,1.000000
+keras_class_acc::Tomato___Leaf_Mold,1.000000
+tflite_class_acc::Tomato___Leaf_Mold,1.000000
+keras_class_acc::Tomato___Septoria_leaf_spot,1.000000
+tflite_class_acc::Tomato___Septoria_leaf_spot,1.000000
+keras_class_acc::Tomato___Spider_mites Two-spotted_spider_mite,0.961538
+tflite_class_acc::Tomato___Spider_mites Two-spotted_spider_mite,0.961538
+keras_class_acc::Tomato___Target_Spot,1.000000
+tflite_class_acc::Tomato___Target_Spot,1.000000
+keras_class_acc::Tomato___Tomato_Yellow_Leaf_Curl_Virus,1.000000
+tflite_class_acc::Tomato___Tomato_Yellow_Leaf_Curl_Virus,1.000000
+keras_class_acc::Tomato___Tomato_mosaic_virus,1.000000
+tflite_class_acc::Tomato___Tomato_mosaic_virus,1.000000
+keras_class_acc::Tomato___healthy,1.000000
+tflite_class_acc::Tomato___healthy,1.000000

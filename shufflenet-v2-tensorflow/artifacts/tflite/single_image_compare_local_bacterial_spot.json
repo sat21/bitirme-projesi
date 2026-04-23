@@ -1,0 +1,43 @@
+{
+  "image": "/mnt/021630F41630E9F5/PROJECTS/torch/tomato/Tomato___Bacterial_spot/fea5289e-4a3a-4891-bbcc-fb38b75a23f9___UF.GRC_BS_Lab Leaf 1164_final_masked.jpg",
+  "keras_topk": [
+    {
+      "label": "Tomato___Bacterial_spot",
+      "confidence": 0.9585197195005478
+    },
+    {
+      "label": "Tomato___Septoria_leaf_spot",
+      "confidence": 0.029802111460142094
+    },
+    {
+      "label": "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+      "confidence": 0.006552724899878655
+    }
+  ],
+  "tflite_topk": [
+    {
+      "label": "Tomato___Bacterial_spot",
+      "confidence": 0.9496244111568035
+    },
+    {
+      "label": "Tomato___Septoria_leaf_spot",
+      "confidence": 0.036498521948160854
+    },
+    {
+      "label": "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+      "confidence": 0.006567392532767479
+    }
+  ],
+  "keras_decision": {
+    "status": "DIAGNOSIS",
+    "top1_confidence": 0.9585197195005478,
+    "margin": 0.9287176080404057
+  },
+  "tflite_decision": {
+    "status": "DIAGNOSIS",
+    "top1_confidence": 0.9496244111568035,
+    "margin": 0.9131258892086427
+  },
+  "top1_same": true,
+  "probability_l1_distance": 0.017806319011014374
+}

@@ -1,0 +1,11 @@
+.venv/
+.venv-1/
+tf1env/
+.vscode/
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+shufflenet-v2-tensorflow/venv/
+shufflenet-v2-tensorflow-git-backup-*/
+.git-nested-backup-*/
+.git-root-backup-*/

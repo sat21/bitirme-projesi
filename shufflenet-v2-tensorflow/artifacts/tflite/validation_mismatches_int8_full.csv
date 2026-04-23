@@ -1,0 +1,4 @@
+image_path,label,keras_pred,tflite_pred
+/mnt/021630F41630E9F5/PROJECTS/torch/tomato/Tomato___Leaf_Mold/7a8f225e-a87c-47ca-a49d-27b620951a4e___Crnl_L.Mold 6497_final_masked.jpg,Tomato___Leaf_Mold,Tomato___Leaf_Mold,Tomato___Spider_mites Two-spotted_spider_mite
+/mnt/021630F41630E9F5/PROJECTS/torch/tomato/Tomato___Leaf_Mold/67001860-5fda-495c-b2fb-a036f21448f8___Crnl_L.Mold 8838_final_masked.jpg,Tomato___Leaf_Mold,Tomato___Septoria_leaf_spot,Tomato___Leaf_Mold
+/mnt/021630F41630E9F5/PROJECTS/torch/tomato/Tomato___Early_blight/87b9735b-4018-4b28-b0b3-422a184a6716___RS_Erly.B 7509_final_masked.jpg,Tomato___Early_blight,Tomato___Late_blight,Tomato___Early_blight
