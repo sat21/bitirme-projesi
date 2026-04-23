@@ -1,51 +1,51 @@
 # Bitirme Projesi
 
-This repository contains the full graduation-project workspace for tomato disease classification, model training, deployment artifacts, and Android integration.
+Bu depo; domates hastalığı sınıflandırma, model eğitimi, dağıtım çıktıları ve Android entegrasyonunu içeren bitirme projesinin tam çalışma alanıdır.
 
-## Repository Layout
+## Depo Yapısı
 
-- `shufflenet-v2-tensorflow/`: Training, evaluation, conversion, and deployment scripts.
-- `tomatech-android/`: Android app that runs on-device inference.
-- `tomato/`: Tomato image dataset used by training workflows.
-- `checkpoints_tomato_*`: Saved checkpoints and evaluation outputs for multiple experiments.
-- `teknofest_2026_on_degerlendirme/`: Reporting and review materials.
+- `shufflenet-v2-tensorflow/`: Eğitim, değerlendirme, dönüştürme ve dağıtım betikleri.
+- `tomatech-android/`: Cihaz üzerinde çıkarım yapan Android uygulaması.
+- `tomato/`: Eğitim akışlarında kullanılan domates görüntü veri seti.
+- `checkpoints_tomato_*`: Farklı deneylere ait kayıtlı checkpoint ve değerlendirme çıktıları.
+- `teknofest_2026_on_degerlendirme/`: Raporlama ve inceleme materyalleri.
 
-## Quick Start (Linux)
+## Hızlı Başlangıç (Linux)
 
-1. Create and activate a virtual environment.
+1. Bir sanal ortam oluşturun ve etkinleştirin.
 
 ~~~bash
 python3 -m venv .venv
 source .venv/bin/activate
 ~~~
 
-2. Install project dependencies.
+2. Proje bağımlılıklarını kurun.
 
 ~~~bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ~~~
 
-3. Run training or evaluation scripts from the relevant subfolder.
+3. İlgili alt klasörden eğitim veya değerlendirme betiklerini çalıştırın.
 
 ~~~bash
 cd shufflenet-v2-tensorflow
 python train_tomato_1_5x_aug.py
 ~~~
 
-## Git Workflow
+## Git İş Akışı
 
-- Main branch: `main`
-- Prefer feature branches for risky changes.
-- Use small commits and push often.
-- For shared history cleanup, prefer `git revert` over destructive rewrites.
+- Ana dal: `main`
+- Riskli değişiklikler için özellik dalları kullanın.
+- Küçük commitler atın ve sık push yapın.
+- Ortak geçmişi düzeltirken yıkıcı yeniden yazımlar yerine `git revert` kullanın.
 
-## Large File Policy
+## Büyük Dosya Politikası
 
-This repository intentionally tracks important model outputs and dataset assets required for reproducibility.
+Bu depo, yeniden üretilebilirlik için gerekli önemli model çıktıları ve veri seti varlıklarını bilinçli olarak takip eder.
 
-The `.gitignore` file blocks local environments, migration backups, and future generated runtime/log/cache artifacts so new commits stay cleaner.
+`.gitignore` dosyası; yerel ortamları, taşıma yedeklerini ve gelecekte üretilecek çalışma zamanı/günlük/önbellek çıktılarının yeni commitlere karışmasını engeller.
 
-## Current Remote
+## Mevcut Uzak Repo
 
 - GitHub: https://github.com/sat21/bitirme-projesi
