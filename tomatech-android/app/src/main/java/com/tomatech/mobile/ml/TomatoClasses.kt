@@ -8,7 +8,9 @@ data class Prediction(
 data class InferenceResult(
     val top1: Prediction,
     val top3: List<Prediction>,
-    val latencyMs: Float
+    val latencyMs: Float,
+    val top3Mass: Float,
+    val normalizedEntropy: Float
 )
 
 object TomatoClasses {
@@ -22,7 +24,8 @@ object TomatoClasses {
         "Tomato___Target_Spot",
         "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
         "Tomato___Tomato_mosaic_virus",
-        "Tomato___healthy"
+        "Tomato___healthy",
+        "Background_Out_Of_Domain"
     )
 
     fun displayName(raw: String): String {

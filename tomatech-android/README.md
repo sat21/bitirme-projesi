@@ -8,6 +8,8 @@ Native Android (Kotlin + Compose) offline tomato disease diagnosis app.
 - CameraX live preview capture (tap-to-focus + flash toggle + front/back lens switch)
 - On-device TensorFlow Lite inference
 - Three-state decision layer (Diagnosis / Uncertain / Invalid Image)
+- Distribution-aware uncertainty gate (top-3 mass + normalized entropy)
+- Temperature-scaled probabilities to reduce over-confident outputs
 - Result safety layer with status-based next-step guidance and invalid-image suppression
 - Top-1 and Top-3 prediction output
 - Inference latency display (ms)
@@ -44,6 +46,7 @@ Native Android (Kotlin + Compose) offline tomato disease diagnosis app.
   - Resize 224x224
   - Normalize with x / 127.5 - 1.0
 - Current latency is measured on device at inference call level and shown in UI.
+- Current probability calibration factor (ModelCalibration.kt): temperature = 2.40f
 - Three-state decision thresholds (in DecisionThresholds.kt):
   - Invalid Image: top-1 confidence < 0.70
   - Uncertain: top-1 confidence < 0.90 OR top-1/top-2 margin < 0.10
@@ -66,3 +69,23 @@ cd tomatech-android
 ```
 
 Bu komut, negatif ornekler ile karar esiklerini kalibre eder ve Android icin onerilen esik snippet'ini terminale yazar.
+
+## Phase 6 Quick Run (Temperature Calibration)
+
+```bash
+cd tomatech-android
+./scripts/run_phase6_temperature_calibration.sh
+```
+
+Opsiyonel negatif klasor ve ek arguman ornegi:
+
+```bash
+./scripts/run_phase6_temperature_calibration.sh \
+  ../shufflenet-v2-tensorflow/calibration_data/negatives_phase5_expanded_20260419 \
+  --max-positive-samples 1500 \
+  --temperature-min 0.90 \
+  --temperature-max 3.20 \
+  --temperature-step 0.10
+```
+
+Detayli dokuman: docs/phase6_temperature_calibration.md

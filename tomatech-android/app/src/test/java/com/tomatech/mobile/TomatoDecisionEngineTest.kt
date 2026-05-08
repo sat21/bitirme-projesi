@@ -205,12 +205,62 @@ class TomatoDecisionEngineTest {
         assertEquals(DiagnosisStatus.UNCERTAIN, decision.status)
     }
 
+    @Test
+    fun highConfidence_withHighEntropy_isUncertain() {
+        val result = inferenceResult(
+            topLabel = "Tomato___Tomato_mosaic_virus",
+            topConfidence = 0.94f,
+            secondConfidence = 0.03f,
+            normalizedEntropy = 0.70f
+        )
+        val signals = ImageValiditySignals(
+            greenPixelRatio = 0.34f,
+            leafLikePixelRatio = 0.31f,
+            skinPixelRatio = 0.01f
+        )
+
+        val decision = TomatoDecisionEngine.buildDecision(
+            result = result,
+            imageSignals = signals,
+            enableVisualInvalidGuard = true
+        )
+
+        assertEquals(DiagnosisStatus.UNCERTAIN, decision.status)
+    }
+
+    @Test
+    fun highConfidence_withLowTop3Mass_isUncertain() {
+        val result = inferenceResult(
+            topLabel = "Tomato___Tomato_mosaic_virus",
+            topConfidence = 0.93f,
+            secondConfidence = 0.03f,
+            thirdConfidence = 0.02f,
+            top3Mass = 0.72f
+        )
+        val signals = ImageValiditySignals(
+            greenPixelRatio = 0.34f,
+            leafLikePixelRatio = 0.31f,
+            skinPixelRatio = 0.01f
+        )
+
+        val decision = TomatoDecisionEngine.buildDecision(
+            result = result,
+            imageSignals = signals,
+            enableVisualInvalidGuard = true
+        )
+
+        assertEquals(DiagnosisStatus.UNCERTAIN, decision.status)
+    }
+
     private fun inferenceResult(
         topLabel: String,
         topConfidence: Float,
         secondConfidence: Float,
-        thirdConfidence: Float = 0.01f
+        thirdConfidence: Float = 0.01f,
+        top3Mass: Float? = null,
+        normalizedEntropy: Float = 0.20f
     ): InferenceResult {
+        val defaultTop3Mass = (topConfidence + secondConfidence + thirdConfidence).coerceIn(0f, 1f)
         return InferenceResult(
             top1 = Prediction(topLabel, topConfidence),
             top3 = listOf(
@@ -218,7 +268,9 @@ class TomatoDecisionEngineTest {
                 Prediction("Tomato___Early_blight", secondConfidence),
                 Prediction("Tomato___Late_blight", thirdConfidence)
             ),
-            latencyMs = 12.3f
+            latencyMs = 12.3f,
+            top3Mass = top3Mass ?: defaultTop3Mass,
+            normalizedEntropy = normalizedEntropy
         )
     }
 }

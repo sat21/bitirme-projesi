@@ -13,7 +13,17 @@ object ImagePreprocessor {
             bitmap
         }
 
-        val resized = Bitmap.createScaledBitmap(sourceBitmap, inputSize, inputSize, true)
+        // Center Crop
+        val width = sourceBitmap.width
+        val height = sourceBitmap.height
+        val minDim = Math.min(width, height)
+        val startX = (width - minDim) / 2
+        val startY = (height - minDim) / 2
+
+        val croppedBitmap = Bitmap.createBitmap(sourceBitmap, startX, startY, minDim, minDim)
+        
+        // Yeniden boyutlandırma (Squashing/ezilme olmadan temiz kare)
+        val resized = Bitmap.createScaledBitmap(croppedBitmap, inputSize, inputSize, true)
         val pixelCount = inputSize * inputSize
         val pixels = IntArray(pixelCount)
         resized.getPixels(pixels, 0, inputSize, 0, 0, inputSize, inputSize)
@@ -31,8 +41,11 @@ object ImagePreprocessor {
             values[outIndex++] = b / 127.5f - 1.0f
         }
 
-        if (resized !== sourceBitmap) {
+        if (resized !== croppedBitmap) {
             resized.recycle()
+        }
+        if (croppedBitmap !== sourceBitmap) {
+            croppedBitmap.recycle()
         }
         if (sourceBitmap !== bitmap) {
             sourceBitmap.recycle()

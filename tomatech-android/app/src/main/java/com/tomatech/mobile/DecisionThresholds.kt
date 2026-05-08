@@ -8,6 +8,8 @@ object DecisionThresholds {
     const val INVALID_IMAGE_CONFIDENCE_THRESHOLD = 0.70f
     const val CONFIDENT_DIAGNOSIS_THRESHOLD = 0.90f
     const val MIN_MARGIN_THRESHOLD = 0.10f
+    const val MIN_TOP3_MASS_FOR_DIAGNOSIS = 0.88f
+    const val MAX_NORMALIZED_ENTROPY_FOR_DIAGNOSIS = 0.50f
     const val MIN_GREEN_PIXEL_RATIO_FOR_LEAF = 0.08f
     const val MIN_LEAF_LIKE_PIXEL_RATIO = 0.12f
     const val HARD_INVALID_GREEN_PIXEL_RATIO = 0.03f

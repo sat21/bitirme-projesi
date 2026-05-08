@@ -10,6 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import kotlin.math.exp
+import kotlin.math.ln
 import kotlin.math.roundToInt
 
 class TomatoClassifier(
@@ -69,11 +70,15 @@ class TomatoClassifier(
         val ranked = probabilities
             .mapIndexed { index, score -> Prediction(TomatoClasses.labels[index], score) }
             .sortedByDescending { it.confidence }
+        val top3Mass = ranked.take(3).sumOf { it.confidence.toDouble() }.toFloat()
+        val normalizedEntropy = normalizedEntropy(probabilities)
 
         return InferenceResult(
             top1 = ranked.first(),
             top3 = ranked.take(3),
-            latencyMs = latencyMs
+            latencyMs = latencyMs,
+            top3Mass = top3Mass,
+            normalizedEntropy = normalizedEntropy
         )
     }
 
@@ -82,7 +87,7 @@ class TomatoClassifier(
             DataType.FLOAT32 -> {
                 val output = Array(1) { FloatArray(numClasses) }
                 interpreter.run(inputBuffer, output)
-                softmax(output[0])
+                softmax(output[0], ModelCalibration.TEMPERATURE_SCALING_FACTOR)
             }
 
             DataType.INT8 -> {
@@ -92,7 +97,7 @@ class TomatoClassifier(
                 for (i in 0 until numClasses) {
                     dequantized[i] = (output[0][i].toInt() - outputZeroPoint) * outputScale
                 }
-                softmax(dequantized)
+                softmax(dequantized, ModelCalibration.TEMPERATURE_SCALING_FACTOR)
             }
 
             DataType.UINT8 -> {
@@ -103,7 +108,7 @@ class TomatoClassifier(
                     val raw = output[0][i].toInt() and 0xFF
                     dequantized[i] = (raw - outputZeroPoint) * outputScale
                 }
-                softmax(dequantized)
+                softmax(dequantized, ModelCalibration.TEMPERATURE_SCALING_FACTOR)
             }
 
             else -> error("Unsupported output dtype: $outputDataType")
@@ -147,13 +152,15 @@ class TomatoClassifier(
         }
     }
 
-    private fun softmax(values: FloatArray): FloatArray {
+    private fun softmax(values: FloatArray, temperature: Float): FloatArray {
+        val safeTemperature = temperature.coerceAtLeast(0.05f)
         val maxValue = values.maxOrNull() ?: 0f
         val exps = FloatArray(values.size)
         var sum = 0f
 
         for (i in values.indices) {
-            val e = exp(values[i] - maxValue)
+            val shifted = (values[i] - maxValue) / safeTemperature
+            val e = exp(shifted)
             exps[i] = e
             sum += e
         }
@@ -167,6 +174,22 @@ class TomatoClassifier(
         }
 
         return exps
+    }
+
+    private fun normalizedEntropy(probabilities: FloatArray): Float {
+        if (probabilities.isEmpty()) {
+            return 1f
+        }
+
+        var entropy = 0.0
+        for (prob in probabilities) {
+            if (prob > 1e-12f) {
+                entropy -= prob * ln(prob)
+            }
+        }
+
+        val maxEntropy = ln(probabilities.size.toFloat()).coerceAtLeast(1e-12f)
+        return (entropy / maxEntropy).coerceIn(0.0, 1.0).toFloat()
     }
 
     private fun loadModelFile(context: Context, modelAssetName: String): ByteBuffer {

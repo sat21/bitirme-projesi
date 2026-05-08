@@ -21,11 +21,11 @@ BATCH_SIZE = 32
 EPOCHS = 50
 LEARNING_RATE = 0.01
 IMAGE_SIZE = 224
-NUM_CLASSES = 10
+NUM_CLASSES = 11
 TRAIN_SPLIT = 0.8
 
 # Veri seti yolu
-DATA_DIR = '/home/excalibur/Documents/torch/tomato'
+DATA_DIR = '/mnt/50267C3D267C265E/yeni birim/PROJECTS/torch/tomato'
 
 # Sınıf isimleri
 CLASS_NAMES = [
@@ -38,7 +38,8 @@ CLASS_NAMES = [
     'Tomato___Target_Spot',
     'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
     'Tomato___Tomato_mosaic_virus',
-    'Tomato___healthy'
+    'Tomato___healthy',
+    'Background_Out_Of_Domain'
 ]
 
 
@@ -293,8 +294,25 @@ def create_dataset(image_paths, labels, batch_size, shuffle=True):
     """TensorFlow Dataset oluştur"""
     
     def load_and_preprocess(img_path, label):
-        img = tf.numpy_function(preprocess_image, [img_path], tf.float32)
-        img.set_shape([IMAGE_SIZE, IMAGE_SIZE, 3])
+        img_str = tf.io.read_file(img_path)
+        img = tf.image.decode_jpeg(img_str, channels=3)
+        img = tf.cast(img, tf.float32) / 255.0
+        
+        if shuffle:
+            # Eğitim aşamasında Data Augmentation (Phase 2 çözüm)
+            img = tf.image.resize_with_crop_or_pad(img, IMAGE_SIZE + 32, IMAGE_SIZE + 32)
+            img = tf.image.random_crop(img, size=[IMAGE_SIZE, IMAGE_SIZE, 3])
+            img = tf.image.random_flip_left_right(img)
+            img = tf.image.random_brightness(img, max_delta=0.2)
+            img = tf.image.random_contrast(img, lower=0.8, upper=1.2)
+        else:
+            # Val/Test aşamasında sadece boyutlandırma
+            img = tf.image.resize(img, [IMAGE_SIZE, IMAGE_SIZE])
+            
+        img = (img - 0.5) / 0.5  # Normalize [-1, 1]
+        
+        # Label Smoothing için etiketleri One-Hot formatına çeviriyoruz
+        label = tf.one_hot(label, NUM_CLASSES)
         return img, label
     
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
@@ -350,7 +368,8 @@ def main():
         momentum=0.9
     )
     
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    # Faz 2: Label Smoothing eklendi. (Modelin %99 rastgele bir hastalığa kitlenmesini engeller)
+    loss_fn = tf.keras.losses.CategoricalCrossentropy(from_logits=True, label_smoothing=0.1)
     
     # Compile
     model.compile(

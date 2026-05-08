@@ -134,6 +134,8 @@ class TomatoViewModel(application: Application) : AndroidViewModel(application) 
                             "TomatoDecision",
                             "status=${decision.status} top=${"%.3f".format(decision.topConfidence)} " +
                                 "margin=${"%.3f".format(decision.margin)} label=${computation.result.top1.label} " +
+                                "top3Mass=${"%.3f".format(computation.result.top3Mass)} " +
+                                "entropy=${"%.3f".format(computation.result.normalizedEntropy)} " +
                                 "green=${"%.3f".format(computation.imageSignals.greenPixelRatio)} " +
                                 "leafLike=${"%.3f".format(computation.imageSignals.leafLikePixelRatio)} " +
                                 "skin=${"%.3f".format(computation.imageSignals.skinPixelRatio)}"

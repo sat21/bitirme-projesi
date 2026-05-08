@@ -88,5 +88,6 @@ Not: Bu bolum terminal ve adb ile otomatik dogrulanmistir. Asagidaki maddeler go
 - Post-kalibrasyon regresyonu: :app:assembleDebug PASS ve debug APK cihaza yeniden deploy edildi.
 - Non-leaf false-positive sikayetine karsi guard sikilastirildi: leaf-like ve dominant-green sinyali ayni anda dusukse (high-confidence disease dahi olsa) INVALID_IMAGE'e terfi ediliyor; rollback icin ENABLE_VISUAL_INVALID_GUARD aktif/kapatilabilir kaldi.
 - Regresyon durumu (son guncelleme): :app:testDebugUnitTest PASS (9 test), :app:assembleDebug PASS, APK fiziksel cihaza (R58N91LNP2N) yeniden kuruldu ve install Success.
+- Faz 6 / Temperature Calibration (guard-railli): max-positive-samples=1500 + expanded negatives ile onerilen TEMPERATURE_SCALING_FACTOR 2.40f oldu; ModelCalibration'a uygulandi.
+- Faz 6 raporlari: shufflenet-v2-tensorflow/artifacts/tflite/temperature_calibration_report_phase6_guardrail_20260427.json ve .../temperature_calibration_candidates_phase6_guardrail_20260427.csv
 - Acik sorunlar: Bu checklist kapsaminda acik sorun kalmadi.
-guygy

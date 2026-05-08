@@ -1,0 +1,81 @@
+{
+  "config": {
+    "tflite_model": "/mnt/021630F41630E9F5/PROJECTS/torch/shufflenet-v2-tensorflow/artifacts/tflite/checkpoints_tomato_1_5x_baseline_best_model_int8.tflite",
+    "data_dir": "/mnt/021630F41630E9F5/PROJECTS/torch/tomato",
+    "negative_dir": "shufflenet-v2-tensorflow/calibration_data/negatives_phase5_expanded_20260419",
+    "image_size": 224,
+    "calibration_split": 0.5,
+    "seed": 42,
+    "temperature_min": 0.9,
+    "temperature_max": 2.2,
+    "temperature_step": 0.05,
+    "current_temperature": 1.35,
+    "decision_thresholds": {
+      "invalid_conf": 0.7,
+      "confident_conf": 0.9,
+      "margin": 0.1,
+      "min_top3_mass": 0.88,
+      "max_normalized_entropy": 0.5
+    }
+  },
+  "dataset": {
+    "calibration_positive_count": 897,
+    "evaluation_positive_count": 903,
+    "evaluation_negative_count": 369
+  },
+  "baseline_temperature_1_0": {
+    "temperature": 1.0,
+    "objective": 1.352606172513394,
+    "cal_nll": 0.007118637673556805,
+    "eval_ece": 0.0018343950558870471,
+    "eval_pos_top1_mean": 0.9981708526611328,
+    "eval_pos_top1_p95": 1.0,
+    "eval_pos_diag_rate": 0.9955703211517165,
+    "eval_pos_uncertain_rate": 0.0011074197120708748,
+    "eval_pos_invalid_rate": 0.0033222591362126247,
+    "eval_pos_diag_acc": 1.0,
+    "eval_pos_overall_acc": 0.9977851605758582,
+    "eval_neg_diag_rate": 0.7208672086720868,
+    "eval_neg_uncertain_rate": 0.15447154471544716,
+    "eval_neg_invalid_rate": 0.12466124661246612,
+    "eval_neg_top1_mean": 0.9043503999710083,
+    "eval_neg_top1_p95": 0.9999998807907104
+  },
+  "current_temperature": {
+    "temperature": 1.35,
+    "objective": 1.1205645218171378,
+    "cal_nll": 0.008608557283878326,
+    "eval_ece": 0.0030493346823674368,
+    "eval_pos_top1_mean": 0.996487021446228,
+    "eval_pos_top1_p95": 0.9999997615814209,
+    "eval_pos_diag_rate": 0.9922480620155039,
+    "eval_pos_uncertain_rate": 0.004429678848283499,
+    "eval_pos_invalid_rate": 0.0033222591362126247,
+    "eval_pos_diag_acc": 1.0,
+    "eval_pos_overall_acc": 0.9977851605758582,
+    "eval_neg_diag_rate": 0.5745257452574526,
+    "eval_neg_uncertain_rate": 0.25474254742547425,
+    "eval_neg_invalid_rate": 0.17073170731707318,
+    "eval_neg_top1_mean": 0.8689174652099609,
+    "eval_neg_top1_p95": 0.9999934434890747
+  },
+  "recommended_temperature": {
+    "temperature": 2.2,
+    "objective": 0.791607330310732,
+    "cal_nll": 0.023838788270950317,
+    "eval_ece": 0.017795932319341175,
+    "eval_pos_top1_mean": 0.9819771647453308,
+    "eval_pos_top1_p95": 0.9998514652252197,
+    "eval_pos_diag_rate": 0.9767441860465116,
+    "eval_pos_uncertain_rate": 0.014396456256921373,
+    "eval_pos_invalid_rate": 0.008859357696566999,
+    "eval_pos_diag_acc": 1.0,
+    "eval_pos_overall_acc": 0.9977851605758582,
+    "eval_neg_diag_rate": 0.37398373983739835,
+    "eval_neg_uncertain_rate": 0.2899728997289973,
+    "eval_neg_invalid_rate": 0.33604336043360433,
+    "eval_neg_top1_mean": 0.7836229205131531,
+    "eval_neg_top1_p95": 0.9991763234138489
+  },
+  "top_candidates_csv": "shufflenet-v2-tensorflow/artifacts/tflite/temperature_calibration_candidates_phase6_20260427.csv"
+}

@@ -18,6 +18,9 @@ object TomatoDecisionEngine {
         val topConfidence = result.top1.confidence
         val secondConfidence = result.top3.getOrNull(1)?.confidence ?: 0f
         val margin = topConfidence - secondConfidence
+        val promoteToUncertainByDistribution =
+            result.top3Mass < DecisionThresholds.MIN_TOP3_MASS_FOR_DIAGNOSIS ||
+                result.normalizedEntropy > DecisionThresholds.MAX_NORMALIZED_ENTROPY_FOR_DIAGNOSIS
 
         val promoteToInvalidByVisualSignal = shouldPromoteToInvalidByVisualSignal(
             result = result,
@@ -26,8 +29,11 @@ object TomatoDecisionEngine {
             enableVisualInvalidGuard = enableVisualInvalidGuard
         )
 
+        val isBackgroundPredicted = result.top1.label == "Background_Out_Of_Domain"
+
         return when {
-            topConfidence < DecisionThresholds.INVALID_IMAGE_CONFIDENCE_THRESHOLD ||
+            isBackgroundPredicted ||
+                topConfidence < DecisionThresholds.INVALID_IMAGE_CONFIDENCE_THRESHOLD ||
                 promoteToInvalidByVisualSignal -> {
                 DiagnosisDecision(
                     status = DiagnosisStatus.INVALID_IMAGE,
@@ -39,7 +45,8 @@ object TomatoDecisionEngine {
             }
 
             topConfidence < DecisionThresholds.CONFIDENT_DIAGNOSIS_THRESHOLD ||
-                margin < DecisionThresholds.MIN_MARGIN_THRESHOLD -> {
+                margin < DecisionThresholds.MIN_MARGIN_THRESHOLD ||
+                promoteToUncertainByDistribution -> {
                 DiagnosisDecision(
                     status = DiagnosisStatus.UNCERTAIN,
                     title = "On Teshis Belirsiz",
