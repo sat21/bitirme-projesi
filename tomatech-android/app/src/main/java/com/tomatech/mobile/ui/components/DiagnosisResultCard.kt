@@ -1,315 +1,238 @@
 package com.tomatech.mobile.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.rounded.Insights
+import androidx.compose.material.icons.rounded.Biotech
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.tomatech.mobile.DecisionThresholds
+import androidx.compose.ui.unit.sp
 import com.tomatech.mobile.DiagnosisDecision
-import com.tomatech.mobile.DiagnosisStatus
 import com.tomatech.mobile.ml.InferenceResult
-import com.tomatech.mobile.ml.Prediction
-import com.tomatech.mobile.ml.TomatoClasses
+import com.tomatech.mobile.ui.theme.*
 import java.util.Locale
 
 @Composable
-fun DiagnosisResultCard(
-    result: InferenceResult,
-    decision: DiagnosisDecision?,
-    modifier: Modifier = Modifier,
-) {
-    val status = decision?.status
-    val computedMargin = decision?.margin
-        ?: (result.top1.confidence - (result.top3.getOrNull(1)?.confidence ?: 0f))
-    val shouldHideClassPredictions = status == DiagnosisStatus.INVALID_IMAGE ||
-        (decision?.title?.contains("Gecersiz", ignoreCase = true) == true) ||
-        (decision == null &&
-            result.top1.confidence < DecisionThresholds.INVALID_IMAGE_CONFIDENCE_THRESHOLD)
+fun DiagnosisResultCard(result: InferenceResult, decision: DiagnosisDecision?, modifier: Modifier = Modifier) {
+    val isHealthy = result.top1.label.lowercase().contains("healthy")
+    val isBackground = result.top1.label.lowercase().contains("background")
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+    val statusColor = when {
+        isHealthy -> SuccessGreen
+        isBackground -> Color.Gray
+        else -> ErrorRed
+    }
+
+    val displayIcon = when {
+        isHealthy -> Icons.Default.CheckCircle
+        isBackground -> Icons.Default.Info
+        else -> Icons.Default.Warning
+    }
+    
+    // Animating the card layout appearance
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(result) {
+        visible = false
+        visible = true
+    }
+
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(500)) + slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(500, easing = FastOutSlowInEasing))
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+                .shadow(
+                    elevation = 24.dp,
+                    shape = RoundedCornerShape(32.dp),
+                    spotColor = statusColor.copy(alpha = 0.4f)
+                ),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
         ) {
-            Text(
-                text = "Teshis Ozeti",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            if (decision != null) {
-                DecisionBanner(decision = decision)
-                ActionGuidanceCard(decision = decision)
-            }
-
-            if (shouldHideClassPredictions) {
-                InvalidImageSuppressionCard()
-            } else {
-                TopPredictionRow(
-                    prediction = result.top1,
-                    status = status
-                )
-
-                HorizontalDivider()
-
-                Text(
-                    text = if (status == DiagnosisStatus.UNCERTAIN) {
-                        "Alternatif Olasiliklar"
-                    } else {
-                        "Alternatif Tahminler"
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                result.top3.forEachIndexed { index, prediction ->
-                    Text(
-                        text = "${index + 1}. ${TomatoClasses.displayName(prediction.label)} - ${prediction.confidence.toPercentText()}",
-                        style = MaterialTheme.typography.bodySmall
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.White,
+                                statusColor.copy(alpha = 0.03f)
+                            )
+                        )
                     )
+            ) {
+                Column(modifier = Modifier.padding(28.dp)) {
+                    // Header Section
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        // Glowing Icon Wrapper (Glass effect)
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(
+                                            statusColor.copy(alpha = 0.15f),
+                                            statusColor.copy(alpha = 0.05f)
+                                        )
+                                    )
+                                )
+                                .border(1.dp, statusColor.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(displayIcon, contentDescription = null, tint = statusColor, modifier = Modifier.size(36.dp))
+                        }
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        Column {
+                            Text("YZ Analiz Sonucu", style = MaterialTheme.typography.labelLarge, color = statusColor, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                            Text(
+                                text = decision?.title ?: "Belirlenemedi",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Black,
+                                color = TextPrimary
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(28.dp))
+                    HorizontalDivider(color = Color.Gray.copy(alpha = 0.15f))
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    if (!isBackground) {
+                        // Technical Title
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Rounded.Biotech, contentDescription = null, tint = statusColor, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "TEKNİK DETAYLAR",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextSecondary,
+                                letterSpacing = 1.5.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Glassmorphic Info Boxes
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            DetailBox(
+                                label = "Model Yüzdesi",
+                                value = String.format(Locale.getDefault(), "%%%d", (result.top1.confidence * 100).toInt()),
+                                icon = Icons.Rounded.Insights,
+                                color = statusColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            DetailBox(
+                                label = "Teşhis Sınıfı",
+                                value = result.top1.label.removePrefix("Tomato___").replace("_", " "),
+                                icon = null,
+                                color = TextPrimary,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Animated Progress Bar
+                        val targetProgress = result.top1.confidence
+                        val animatedProgress by animateFloatAsState(
+                            targetValue = if (visible) targetProgress else 0f,
+                            animationSpec = tween(1000, delayMillis = 300, easing = FastOutSlowInEasing),
+                            label = "ConfidenceProgress"
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(statusColor.copy(alpha = 0.05f))
+                                .padding(16.dp)
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Güven Aralığı", style = MaterialTheme.typography.bodySmall, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = if (targetProgress > 0.8) "Yüksek Hassasiyet" else "Orta Hassasiyet",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = statusColor
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            LinearProgressIndicator(
+                                progress = { animatedProgress },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(CircleShape),
+                                color = statusColor,
+                                trackColor = statusColor.copy(alpha = 0.15f)
+                            )
+                        }
+                    } else {
+                        // Background case (Premium)
+                        Surface(
+                            color = Color.Gray.copy(alpha = 0.05f),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.1f)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Info, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(24.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Görüntüde yaprak tespit edilemedi. Lütfen daha yakından ve net bir fotoğraf çekiniz.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = TextSecondary
+                                )
+                            }
+                        }
+                    }
                 }
             }
-
-            HorizontalDivider()
-
-            ConfidenceInterpretation(
-                status = status,
-                topConfidence = decision?.topConfidence ?: result.top1.confidence,
-                margin = computedMargin,
-                showConfidenceNumbers = !shouldHideClassPredictions
-            )
-
-            Text(
-                text = "Cikarim suresi: ${result.latencyMs.toMsText()}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
 
 @Composable
-private fun ActionGuidanceCard(decision: DiagnosisDecision) {
-    val (containerColor, contentColor, actions) = when (decision.status) {
-        DiagnosisStatus.DIAGNOSIS -> Triple(
-            MaterialTheme.colorScheme.secondaryContainer,
-            MaterialTheme.colorScheme.onSecondaryContainer,
-            listOf(
-                "Belirti ilerlemesini 24-48 saat aralikla tekrar kontrol edin.",
-                "Ayni yapragi farkli aci ve isikta tekrar tarayip sonucu karsilastirin.",
-                "Kesin tani icin ziraat uzmani degerlendirmesi alin."
-            )
-        )
-
-        DiagnosisStatus.UNCERTAIN -> Triple(
-            MaterialTheme.colorScheme.tertiaryContainer,
-            MaterialTheme.colorScheme.onTertiaryContainer,
-            listOf(
-                "Tek bir yapragi duz arka planda yeniden cekin.",
-                "Isigi artirin ve bulaniklik olusmamasina dikkat edin.",
-                "En az 2 farkli kareyle tekrar analiz yapin."
-            )
-        )
-
-        DiagnosisStatus.INVALID_IMAGE -> Triple(
-            MaterialTheme.colorScheme.errorContainer,
-            MaterialTheme.colorScheme.onErrorContainer,
-            listOf(
-                "Kadraja sadece domates yapragi alin.",
-                "Kamerayi sabitleyip net bir goruntu cekin.",
-                "Gerekirse galeriden daha net bir fotograf secin."
-            )
-        )
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
+fun DetailBox(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector?, color: Color, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFFF7F9FC))
+            .border(1.dp, Color.White, RoundedCornerShape(16.dp))
+            .padding(16.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "Sonraki Adimlar",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = contentColor
-            )
-
-            actions.forEachIndexed { index, action ->
-                Text(
-                    text = "${index + 1}) $action",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = contentColor
-                )
-            }
+        if (icon != null) {
+            Icon(icon, contentDescription = null, tint = color.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.height(4.dp))
         }
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = color, maxLines = 2)
     }
-}
-
-@Composable
-private fun InvalidImageSuppressionCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Text(
-            text = "Bu durumda sinif tahminleri gizlenir. Once daha net bir yaprak goruntusu alin.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(12.dp)
-        )
-    }
-}
-
-@Composable
-private fun ConfidenceInterpretation(
-    status: DiagnosisStatus?,
-    topConfidence: Float,
-    margin: Float,
-    showConfidenceNumbers: Boolean,
-) {
-    val message = when (status) {
-        DiagnosisStatus.DIAGNOSIS -> "Bu sonuc on teshistir; karar vermeden once saha gozlemi ve uzman gorusu ile dogrulayin."
-        DiagnosisStatus.UNCERTAIN -> "Model kararsiz sinyal verdi. Guvenli karar icin yeniden cekim yapilmasi onerilir."
-        DiagnosisStatus.INVALID_IMAGE -> "Goruntu kalite/kapsam acisindan yetersiz bulundu. Sinif sonucu uretmek yerine tekrar cekim yapin."
-        null -> "Sonuc yorumu olusturulamadi."
-    }
-
-    if (showConfidenceNumbers) {
-        Text(
-            text = "Model guveni: ${topConfidence.toPercentText()} | Ayrim gucu: ${margin.toPercentText()}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-
-    Text(
-        text = message,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}
-
-@Composable
-private fun DecisionBanner(decision: DiagnosisDecision) {
-    val containerColor = when (decision.status) {
-        DiagnosisStatus.DIAGNOSIS -> MaterialTheme.colorScheme.primaryContainer
-        DiagnosisStatus.UNCERTAIN -> MaterialTheme.colorScheme.tertiaryContainer
-        DiagnosisStatus.INVALID_IMAGE -> MaterialTheme.colorScheme.errorContainer
-    }
-
-    val contentColor = when (decision.status) {
-        DiagnosisStatus.DIAGNOSIS -> MaterialTheme.colorScheme.onPrimaryContainer
-        DiagnosisStatus.UNCERTAIN -> MaterialTheme.colorScheme.onTertiaryContainer
-        DiagnosisStatus.INVALID_IMAGE -> MaterialTheme.colorScheme.onErrorContainer
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = decision.title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = contentColor
-            )
-
-            Text(
-                text = decision.message,
-                style = MaterialTheme.typography.bodySmall,
-                color = contentColor
-            )
-
-            if (decision.status != DiagnosisStatus.INVALID_IMAGE) {
-                Text(
-                    text = "Model guveni: ${decision.topConfidence.toPercentText()} | Ayrim gucu: ${decision.margin.toPercentText()}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = contentColor
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TopPredictionRow(
-    prediction: Prediction,
-    status: DiagnosisStatus?,
-) {
-    val title = when (status) {
-        DiagnosisStatus.UNCERTAIN -> "Olasi Birinci Tahmin"
-        else -> "Birinci Tahmin"
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = TomatoClasses.displayName(prediction.label),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Text(
-                text = prediction.confidence.toPercentText(),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
-
-private fun Float.toPercentText(): String {
-    val rawPercent = this * 100f
-    val displayPercent = if (this in 0f..<1f) {
-        rawPercent.coerceAtMost(99.99f)
-    } else {
-        rawPercent
-    }
-    return String.format(Locale.US, "%.2f%%", displayPercent)
-}
-
-private fun Float.toMsText(): String {
-    return String.format(Locale.US, "%.2f ms", this)
 }

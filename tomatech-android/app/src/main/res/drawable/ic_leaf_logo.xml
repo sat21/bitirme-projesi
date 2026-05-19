@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group 
+        android:scaleX="0.55" 
+        android:scaleY="0.55" 
+        android:pivotX="54" 
+        android:pivotY="54"
+        android:translateY="5">
+      <!-- Sağ Taraf (Koyu Yeşil) -->
+      <path
+          android:pathData="M54,12 C54,12 88,38 88,64 C88,82.7 72.7,98 54,98 L54,12 Z"
+          android:fillColor="#4CAF50"/>
+      <!-- Sol Taraf (Açık Yeşil - Gölgelendirme) -->
+      <path
+          android:pathData="M54,12 C54,12 20,38 20,64 C20,82.7 35.3,98 54,98 L54,12 Z"
+          android:fillColor="#81C784"/>
+      <!-- Merkez Damar (Ana Sap) -->
+      <path
+          android:pathData="M54,98 L54,34"
+          android:strokeColor="#2E7D32"
+          android:strokeWidth="4"
+          android:strokeLineCap="round"/>
+      <!-- Yan Yaprak Damarları -->
+      <path
+          android:pathData="M54,74 L70,58"
+          android:strokeColor="#2E7D32"
+          android:strokeWidth="4"
+          android:strokeLineCap="round"/>
+      <path
+          android:pathData="M54,58 L40,46"
+          android:strokeColor="#2E7D32"
+          android:strokeWidth="4"
+          android:strokeLineCap="round"/>
+    </group>
+</vector>

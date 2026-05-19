@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.tomatech.mobile.data.HistoryItem
+import com.tomatech.mobile.data.HistoryRepository
 import com.tomatech.mobile.ml.InferenceResult
 import com.tomatech.mobile.ml.TomatoClassifier
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-private const val DEFAULT_MODEL_ASSET = "checkpoints_tomato_1_5x_baseline_best_model_int8.tflite"
+private const val DEFAULT_MODEL_ASSET = "best_model.tflite"
 
 enum class DiagnosisStatus {
     DIAGNOSIS,
@@ -37,6 +39,7 @@ data class TomatoUiState(
     val selectedBitmap: Bitmap? = null,
     val result: InferenceResult? = null,
     val decision: DiagnosisDecision? = null,
+    val history: List<HistoryItem> = emptyList(),
     val isRunning: Boolean = false,
     val errorMessage: String? = null
 )
@@ -51,6 +54,8 @@ class TomatoViewModel(application: Application) : AndroidViewModel(application) 
     private val _uiState = MutableStateFlow(TomatoUiState())
     val uiState: StateFlow<TomatoUiState> = _uiState.asStateFlow()
 
+    private val historyRepository = HistoryRepository(application)
+
     private val classifier: TomatoClassifier? = runCatching {
         TomatoClassifier(
             context = application,
@@ -62,6 +67,19 @@ class TomatoViewModel(application: Application) : AndroidViewModel(application) 
             it.copy(errorMessage = "Model yuklenemedi: ${throwable.message}")
         }
     }.getOrNull()
+
+    init {
+        loadHistory()
+    }
+
+    private fun loadHistory() {
+        viewModelScope.launch {
+            val items = withContext(Dispatchers.IO) {
+                historyRepository.getAllHistory()
+            }
+            _uiState.update { it.copy(history = items) }
+        }
+    }
 
     fun onImageSelected(bitmap: Bitmap) {
         _uiState.update {
@@ -80,6 +98,24 @@ class TomatoViewModel(application: Application) : AndroidViewModel(application) 
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun clearImage() {
+        _uiState.update {
+            it.copy(
+                selectedBitmap = null,
+                result = null,
+                decision = null,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch(Dispatchers.IO) {
+            historyRepository.clearHistory()
+            loadHistory()
+        }
     }
 
     fun runDiagnosis() {
@@ -148,6 +184,26 @@ class TomatoViewModel(application: Application) : AndroidViewModel(application) 
                             result = computation.result,
                             decision = decision
                         )
+                    }
+
+                    // Save to history (including uncertain or invalid images as requested by user)
+                    if (image != null) {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            val savedLabel = when (decision.status) {
+                                DiagnosisStatus.DIAGNOSIS -> computation.result.top1.label
+                                DiagnosisStatus.UNCERTAIN -> "Belirsiz: ${computation.result.top1.label}"
+                                DiagnosisStatus.INVALID_IMAGE -> "Geçersiz Görsel"
+                            }
+                            
+                            historyRepository.saveHistoryItem(
+                                label = savedLabel,
+                                confidence = computation.result.top1.confidence,
+                                bitmap = image
+                            )
+                            
+                            // Refresh history list to update UI counts
+                            loadHistory()
+                        }
                     }
                 }
                 .onFailure { throwable ->

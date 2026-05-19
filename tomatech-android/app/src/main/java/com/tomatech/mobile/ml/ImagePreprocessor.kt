@@ -36,6 +36,7 @@ object ImagePreprocessor {
             val g = (pixel shr 8) and 0xFF
             val b = pixel and 0xFF
 
+            // TF modeli (-1, 1) aralığında eğitilmişti: (img - 0.5) / 0.5 = img * 2 - 1.0
             values[outIndex++] = r / 127.5f - 1.0f
             values[outIndex++] = g / 127.5f - 1.0f
             values[outIndex++] = b / 127.5f - 1.0f

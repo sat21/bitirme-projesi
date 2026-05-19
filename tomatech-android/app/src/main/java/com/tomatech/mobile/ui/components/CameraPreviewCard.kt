@@ -11,26 +11,20 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -48,6 +42,8 @@ fun CameraPreviewCard(
     onPhotoCaptured: (Uri) -> Unit,
     onError: (String) -> Unit,
     onClose: () -> Unit,
+    captureTrigger: Boolean = false,
+    onCaptureTriggerConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -83,30 +79,9 @@ fun CameraPreviewCard(
                 capture.flashMode = ImageCapture.FLASH_MODE_OFF
 
                 var activeLensFacing = lensFacing
-                var selector = CameraSelector.Builder()
+                val selector = CameraSelector.Builder()
                     .requireLensFacing(activeLensFacing)
                     .build()
-
-                if (!cameraProvider.hasCamera(selector)) {
-                    val fallbackLensFacing = if (activeLensFacing == CameraSelector.LENS_FACING_BACK) {
-                        CameraSelector.LENS_FACING_FRONT
-                    } else {
-                        CameraSelector.LENS_FACING_BACK
-                    }
-
-                    val fallbackSelector = CameraSelector.Builder()
-                        .requireLensFacing(fallbackLensFacing)
-                        .build()
-
-                    if (!cameraProvider.hasCamera(fallbackSelector)) {
-                        error("Bu cihazda kullanilabilir kamera bulunamadi.")
-                    }
-
-                    activeLensFacing = fallbackLensFacing
-                    selector = fallbackSelector
-                    lensFacing = fallbackLensFacing
-                    onError("Secilen kamera bulunamadi. Mevcut kameraya gecis yapildi.")
-                }
 
                 cameraProvider.unbindAll()
                 val camera = cameraProvider.bindToLifecycle(
@@ -133,147 +108,93 @@ fun CameraPreviewCard(
         cameraProviderFuture.addListener(bindCamera, mainExecutor)
 
         onDispose {
-            runCatching {
-                boundCamera?.cameraControl?.enableTorch(false)
-            }
+            runCatching { boundCamera?.cameraControl?.enableTorch(false) }
             boundCamera = null
-            runCatching {
-                cameraProviderFuture.get().unbindAll()
-            }
+            runCatching { cameraProviderFuture.get().unbindAll() }
         }
     }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text(
-                text = "Canli Kamera Onizleme",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Text(
-                text = "Odaklamak icin onizlemeye dokunun.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(280.dp),
-                factory = { previewView },
-                update = { view ->
-                    view.setOnTouchListener { _, event ->
-                        if (event.action == MotionEvent.ACTION_UP) {
-                            val activeCamera = boundCamera
-                            if (activeCamera == null) {
-                                onError("Kamera odagi henuz hazir degil.")
-                                return@setOnTouchListener true
-                            }
-
+    Box(modifier = modifier) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { previewView },
+            update = { view ->
+                view.setOnTouchListener { _, event ->
+                    if (event.action == MotionEvent.ACTION_UP) {
+                        val activeCamera = boundCamera
+                        if (activeCamera != null) {
                             val point = view.meteringPointFactory.createPoint(event.x, event.y)
                             val action = FocusMeteringAction.Builder(
                                 point,
                                 FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE
-                            )
-                                .setAutoCancelDuration(3, TimeUnit.SECONDS)
-                                .build()
+                            ).setAutoCancelDuration(3, TimeUnit.SECONDS).build()
 
+                            runCatching { activeCamera.cameraControl.startFocusAndMetering(action) }
+                        }
+                    }
+                    true
+                }
+            }
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 100.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (hasFlashUnit) {
+                IconButton(
+                    onClick = {
+                        val activeCamera = boundCamera
+                        if (activeCamera != null) {
+                            val newValue = !isFlashEnabled
                             runCatching {
-                                activeCamera.cameraControl.startFocusAndMetering(action)
-                            }.onFailure {
-                                onError("Odaklama baslatilamadi: ${it.message}")
+                                activeCamera.cameraControl.enableTorch(newValue)
+                                isFlashEnabled = newValue
                             }
                         }
-                        true
-                    }
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = onClose,
-                    enabled = !isCapturing
-                ) {
-                    Text("Kapat")
-                }
-
-                OutlinedButton(
-                    onClick = {
-                        runCatching {
-                            boundCamera?.cameraControl?.enableTorch(false)
-                        }
-                        isFlashEnabled = false
-                        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                            CameraSelector.LENS_FACING_FRONT
-                        } else {
-                            CameraSelector.LENS_FACING_BACK
-                        }
                     },
-                    enabled = !isCapturing
+                    modifier = Modifier.background(Color.Black.copy(alpha = 0.4f), CircleShape)
                 ) {
-                    val lensLabel = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                        "On Kameraya Gec"
-                    } else {
-                        "Arka Kameraya Gec"
-                    }
-                    Text(lensLabel)
+                    Icon(
+                        imageVector = if (isFlashEnabled) Icons.Default.FlashOn else Icons.Default.FlashOff,
+                        contentDescription = "Flaş",
+                        tint = Color.White
+                    )
                 }
             }
 
-            OutlinedButton(
+            IconButton(
                 onClick = {
-                    val activeCamera = boundCamera
-                    if (activeCamera == null) {
-                        onError("Kamera henuz hazir degil. Flash degistirilemedi.")
-                        return@OutlinedButton
-                    }
-
-                    val newValue = !isFlashEnabled
-                    runCatching {
-                        activeCamera.cameraControl.enableTorch(newValue)
-                        isFlashEnabled = newValue
-                    }.onFailure {
-                        onError("Flash degistirilemedi: ${it.message}")
+                    runCatching { boundCamera?.cameraControl?.enableTorch(false) }
+                    isFlashEnabled = false
+                    lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                        CameraSelector.LENS_FACING_FRONT
+                    } else {
+                        CameraSelector.LENS_FACING_BACK
                     }
                 },
-                enabled = !isCapturing && hasFlashUnit
+                modifier = Modifier.background(Color.Black.copy(alpha = 0.4f), CircleShape)
             ) {
-                val flashLabel = when {
-                    !hasFlashUnit -> "Flash Yok"
-                    isFlashEnabled -> "Fener Acik"
-                    else -> "Fener Kapali"
-                }
-                Text(flashLabel)
+                Icon(
+                    imageVector = Icons.Default.Cameraswitch,
+                    contentDescription = "Kamera Çevir",
+                    tint = Color.White
+                )
             }
+        }
 
-            Button(
-                onClick = {
-                    val activeCapture = imageCapture
-                    if (activeCapture == null) {
-                        onError("Kamera henuz hazir degil. Biraz sonra tekrar deneyin.")
-                        return@Button
-                    }
-
+        LaunchedEffect(captureTrigger) {
+            if (captureTrigger) {
+                onCaptureTriggerConsumed()
+                if (!isCapturing && imageCapture != null) {
+                    val activeCapture = imageCapture!!
                     activeCapture.flashMode = ImageCapture.FLASH_MODE_OFF
 
                     val photoFile = runCatching {
                         File.createTempFile("tomatech_cx_", ".jpg", context.cacheDir)
-                    }.getOrElse {
-                        onError("Gecici fotograf dosyasi olusturulamadi: ${it.message}")
-                        return@Button
-                    }
+                    }.getOrElse { return@LaunchedEffect }
 
                     onCaptureStart()
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -285,18 +206,13 @@ fun CameraPreviewCard(
                                 onCaptureEnd()
                                 onPhotoCaptured(Uri.fromFile(photoFile))
                             }
-
                             override fun onError(exception: ImageCaptureException) {
                                 onCaptureEnd()
-                                onError("Kamera cekimi basarisiz: ${exception.message}")
+                                onError("Çekim başarısız")
                             }
                         }
                     )
-                },
-                enabled = !isCapturing,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (isCapturing) "Kaydediliyor..." else "Cek")
+                }
             }
         }
     }
