@@ -14,13 +14,13 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
@@ -49,114 +49,73 @@ fun MainScreen(
     onLogout: () -> Unit
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val configuration = LocalConfiguration.current
+    val isSmallScreen = configuration.screenWidthDp < 360
 
     Scaffold(
         bottomBar = {
             Surface(
                 modifier = Modifier
-                    .padding(horizontal = 32.dp, vertical = 24.dp)
+                    .padding(horizontal = if (isSmallScreen) 16.dp else 32.dp, vertical = if (isSmallScreen) 16.dp else 24.dp)
                     .shadow(elevation = 32.dp, shape = RoundedCornerShape(40.dp), spotColor = TomatoPrimary.copy(alpha = 0.6f)),
                 shape = RoundedCornerShape(40.dp),
                 color = Color.White.copy(alpha = 0.95f),
             ) {
-                NavigationBar(
-                    containerColor = Color.Transparent,
-                    tonalElevation = 0.dp,
-                    modifier = Modifier.height(72.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(if (isSmallScreen) 64.dp else 72.dp)
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    NavigationBarItem(
+                    CustomNavItem(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        alwaysShowLabel = false,
-                        icon = { 
-                            Icon(
-                                if (selectedTab == 0) Icons.Rounded.Home else Icons.Outlined.Home, 
-                                contentDescription = "Ana Sayfa", 
-                                modifier = Modifier.size(26.dp)
-                            ) 
-                        },
-                        label = { Text("Ana Sayfa", fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = TomatoPrimary,
-                            indicatorColor = TomatoPrimary.copy(alpha = 0.12f),
-                            unselectedIconColor = Color.Gray.copy(alpha = 0.5f),
-                            unselectedTextColor = TomatoPrimary
-                        )
+                        icon = if (selectedTab == 0) Icons.Rounded.Home else Icons.Outlined.Home,
+                        label = "Ana Sayfa",
+                        isSmallScreen = isSmallScreen
                     )
 
-                    NavigationBarItem(
+                    CustomNavItem(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        alwaysShowLabel = false,
-                        icon = { 
-                            Icon(
-                                if (selectedTab == 1) Icons.Rounded.History else Icons.Outlined.History, 
-                                contentDescription = "Geçmiş", 
-                                modifier = Modifier.size(26.dp)
-                            ) 
-                        },
-                        label = { Text("Geçmiş", fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = TomatoPrimary,
-                            indicatorColor = TomatoPrimary.copy(alpha = 0.12f),
-                            unselectedIconColor = Color.Gray.copy(alpha = 0.5f),
-                            unselectedTextColor = TomatoPrimary
-                        )
+                        icon = if (selectedTab == 1) Icons.Rounded.History else Icons.Outlined.History,
+                        label = "Geçmiş",
+                        isSmallScreen = isSmallScreen
                     )
                     
                     // Central FAB Gap
                     Box(modifier = Modifier.weight(0.4f))
                     
-                    NavigationBarItem(
+                    CustomNavItem(
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 },
-                        alwaysShowLabel = false,
-                        icon = { 
-                            Icon(
-                                if (selectedTab == 2) Icons.Rounded.Analytics else Icons.Outlined.Analytics, 
-                                contentDescription = "Analiz", 
-                                modifier = Modifier.size(26.dp)
-                            ) 
-                        },
-                        label = { Text("Analiz", fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = TomatoPrimary,
-                            indicatorColor = TomatoPrimary.copy(alpha = 0.12f),
-                            unselectedIconColor = Color.Gray.copy(alpha = 0.5f),
-                            unselectedTextColor = TomatoPrimary
-                        )
+                        icon = if (selectedTab == 2) Icons.Rounded.Analytics else Icons.Outlined.Analytics,
+                        label = "Analiz",
+                        isSmallScreen = isSmallScreen
                     )
 
-                    NavigationBarItem(
+                    CustomNavItem(
                         selected = selectedTab == 3,
                         onClick = { selectedTab = 3 },
-                        alwaysShowLabel = false,
-                        icon = { 
-                            Icon(
-                                if (selectedTab == 3) Icons.Rounded.Person else Icons.Outlined.Person, 
-                                contentDescription = "Profil", 
-                                modifier = Modifier.size(26.dp)
-                            ) 
-                        },
-                        label = { Text("Profil", fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = TomatoPrimary,
-                            indicatorColor = TomatoPrimary.copy(alpha = 0.12f),
-                            unselectedIconColor = Color.Gray.copy(alpha = 0.5f),
-                            unselectedTextColor = TomatoPrimary
-                        )
+                        icon = if (selectedTab == 3) Icons.Rounded.Person else Icons.Outlined.Person,
+                        label = "Profil",
+                        isSmallScreen = isSmallScreen
                     )
                 }
             }
         },
         floatingActionButton = {
+            val fabSize = if (isSmallScreen) 64.dp else 76.dp
+            val fabOffset = if (isSmallScreen) 48.dp else 52.dp
             FloatingActionButton(
                 onClick = onNavigateToDiagnosis,
                 containerColor = Color.Transparent,
                 elevation = FloatingActionButtonDefaults.elevation(0.dp),
                 modifier = Modifier
-                    .size(76.dp)
-                    .offset(y = 52.dp)
+                    .size(fabSize)
+                    .offset(y = fabOffset)
                     .shadow(24.dp, CircleShape, spotColor = TomatoPrimary.copy(alpha = 0.8f))
                     .background(
                         Brush.linearGradient(
@@ -176,15 +135,12 @@ fun MainScreen(
                 )
 
                 Box(contentAlignment = Alignment.Center) {
-                    // Scanning Frame Brackets
                     Icon(
                         Icons.Rounded.CenterFocusWeak,
                         contentDescription = null,
                         modifier = Modifier.size(42.dp).scale(scale),
                         tint = Color.White.copy(alpha = 0.5f)
                     )
-                    
-                    // The Leaf
                     Icon(
                         Icons.Rounded.Eco,
                         contentDescription = "Tara", 
@@ -199,7 +155,7 @@ fun MainScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF7F9FC)) // Modern Soft Background
+                .background(Color(0xFFF7F9FC))
                 .padding(innerPadding)
         ) {
             AnimatedContent(
@@ -218,6 +174,59 @@ fun MainScreen(
                     3 -> ProfileDashboard(authViewModel, onNavigateToSettings, onLogout)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun RowScope.CustomNavItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    label: String,
+    isSmallScreen: Boolean
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    // Tıklama anındaki dairesel efekt için
+    val indicatorColor = if (isPressed) TomatoPrimary.copy(alpha = 0.1f) else Color.Transparent
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clip(CircleShape) // Efekti tam yuvarlak yapar
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true, color = TomatoPrimary, radius = 28.dp),
+                onClick = onClick
+            )
+            .padding(vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(if (isSmallScreen) 40.dp else 44.dp)
+                .background(indicatorColor, CircleShape), // Basılı tutunca görünen yuvarlak gölge
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(if (isSmallScreen) 24.dp else 26.dp),
+                tint = if (selected) TomatoPrimary else Color.Gray.copy(alpha = 0.4f)
+            )
+        }
+        
+        AnimatedVisibility(visible = selected) {
+            Text(
+                text = label,
+                fontWeight = FontWeight.Bold,
+                fontSize = if (isSmallScreen) 10.sp else 11.sp,
+                color = TomatoPrimary,
+                maxLines = 1
+            )
         }
     }
 }
@@ -373,6 +382,9 @@ fun HomeDashboard(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
     
+    val configuration = LocalConfiguration.current
+    val isSmallScreen = configuration.screenWidthDp < 360
+    
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     val greeting = when (currentHour) {
         in 5..11 -> "Günaydın ☀️"
@@ -381,7 +393,6 @@ fun HomeDashboard(
         else -> "İyi Geceler 🌙"
     }
 
-    // Health Score Animation
     var animationPlayed by remember { mutableStateOf(false) }
     val currentHealthScore by animateFloatAsState(
         targetValue = if (animationPlayed) 210f else 0f,
@@ -398,12 +409,12 @@ fun HomeDashboard(
             .fillMaxSize()
             .verticalScroll(scrollState)
             .background(Brush.verticalGradient(listOf(Color(0xFFF7F9FC), Color.White)))
+            .windowInsetsPadding(WindowInsets.statusBars)
     ) {
-        // --- SECTION 1: GLASSMORPHIC HEADER ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 32.dp)
+                .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp, vertical = if (isSmallScreen) 12.dp else 32.dp)
         ) {
             Column {
                 Text(
@@ -423,7 +434,6 @@ fun HomeDashboard(
                 )
             }
             
-            // Notification Badge
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -446,74 +456,73 @@ fun HomeDashboard(
             }
         }
 
-        // --- SECTION 2: GARDEN HEALTH MONITOR (GAUGE) ---
+        val gaugeSize = if (isSmallScreen) 72.dp else 100.dp
+        
         Surface(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
                 .fillMaxWidth()
                 .shadow(32.dp, RoundedCornerShape(32.dp), spotColor = TomatoPrimary.copy(alpha = 0.2f)),
             shape = RoundedCornerShape(32.dp),
             color = Color.White
         ) {
             Row(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(if (isSmallScreen) 16.dp else 24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Circular Progress Gauge
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(100.dp)) {
-                    Canvas(modifier = Modifier.size(100.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(gaugeSize)) {
+                    Canvas(modifier = Modifier.size(gaugeSize)) {
                         drawArc(
                             color = Color(0xFFF1F2F6),
                             startAngle = 140f,
                             sweepAngle = 260f,
                             useCenter = false,
-                            style = Stroke(width = 12.dp.toPx(), cap = StrokeCap.Round)
+                            style = Stroke(width = if (isSmallScreen) 8.dp.toPx() else 12.dp.toPx(), cap = StrokeCap.Round)
                         )
                         drawArc(
                             brush = Brush.linearGradient(listOf(SuccessGreen, Color(0xFF55EFC4))),
                             startAngle = 140f,
-                            sweepAngle = currentHealthScore, // Animated Health
+                            sweepAngle = currentHealthScore,
                             useCenter = false,
-                            style = Stroke(width = 12.dp.toPx(), cap = StrokeCap.Round)
+                            style = Stroke(width = if (isSmallScreen) 8.dp.toPx() else 12.dp.toPx(), cap = StrokeCap.Round)
                         )
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("%${(currentHealthScore / 260f * 100).toInt()}", fontWeight = FontWeight.Black, fontSize = 24.sp, color = TextPrimary)
+                        Text("%${(currentHealthScore / 260f * 100).toInt()}", fontWeight = FontWeight.Black, fontSize = if (isSmallScreen) 20.sp else 24.sp, color = TextPrimary)
                         Text("Sağlık", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
                     }
                 }
 
-                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.width(if (isSmallScreen) 16.dp else 24.dp))
 
-                Column {
-                    Text("Genel Durum: Harika", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = TextPrimary)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Genel Durum: Harika", fontWeight = FontWeight.ExtraBold, fontSize = if (isSmallScreen) 16.sp else 18.sp, color = TextPrimary)
                     Text(
-                        "Son 24 saat içinde herhangi bir hastalık belirtisi saptanmadı.",
+                         "Son 24 saat içinde hastalık saptanmadı.",
                         style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary,
-                        lineHeight = 18.sp
+                        lineHeight = 16.sp
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.TrendingUp, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(16.dp))
-                        Text(" Geçen haftaya göre +%5", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(" Geçen haftaya göre +%5", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(if (isSmallScreen) 20.dp else 32.dp))
 
-        // --- NEW SECTION: RECENT SCANS SUMMARY ---
         if (uiState.history.isNotEmpty()) {
             val latestItem = uiState.history.first()
             val labelLower = latestItem.label.lowercase()
             val isHealthy = labelLower.contains("healthy")
             val statusColor = if (isHealthy) SuccessGreen else if (labelLower.contains("geçersiz")) WarningYellow else ErrorRed
 
-            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            Column(modifier = Modifier.padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("Son Tarama", fontWeight = FontWeight.Black, fontSize = 18.sp, color = TextPrimary)
+                    Text("Son Tarama", fontWeight = FontWeight.Black, fontSize = if (isSmallScreen) 16.sp else 18.sp, color = TextPrimary)
                     TextButton(onClick = onNavigateToHistory) {
                         Text("Tümünü Gör", color = TomatoPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
@@ -540,13 +549,12 @@ fun HomeDashboard(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (isSmallScreen) 20.dp else 32.dp))
         }
 
-        // --- SECTION 3: AI SCANNER CTA ---
         Surface(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
                 .fillMaxWidth()
                 .shadow(24.dp, RoundedCornerShape(32.dp), spotColor = TomatoPrimary.copy(alpha = 0.5f)),
             shape = RoundedCornerShape(32.dp),
@@ -561,21 +569,22 @@ fun HomeDashboard(
                 )
 
                 Row(
-                    modifier = Modifier.padding(28.dp),
+                    modifier = Modifier.padding(if (isSmallScreen) 20.dp else 28.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("AI Tarama Başlat", color = Color.White, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                        Text("AI Tarama Başlat", color = Color.White, fontWeight = FontWeight.Black, fontSize = if (isSmallScreen) 18.sp else 22.sp)
                         Text(
                             "Hastalıkları saniyeler içinde tespit etmek için kamerayı kullanın.",
                             color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 16.sp
                         )
                     }
                     
                     Surface(
-                        modifier = Modifier.size(56.dp),
+                        modifier = Modifier.size(if (isSmallScreen) 48.dp else 56.dp),
                         shape = CircleShape,
                         color = Color.White.copy(alpha = 0.2f),
                         onClick = { }
@@ -588,27 +597,26 @@ fun HomeDashboard(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(if (isSmallScreen) 24.dp else 32.dp))
 
-        // --- NEW SECTION 4: AI INSIGHT OF THE DAY ---
         Surface(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)
                 .fillMaxWidth()
                 .shadow(16.dp, RoundedCornerShape(24.dp), spotColor = Color(0xFF6C5CE7).copy(alpha = 0.3f)),
             shape = RoundedCornerShape(24.dp),
             color = Color(0xFFF0EFFF)
         ) {
-            Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    modifier = Modifier.size(52.dp).background(Color(0xFF6C5CE7), CircleShape),
+                    modifier = Modifier.size(if (isSmallScreen) 42.dp else 52.dp).background(Color(0xFF6C5CE7), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Rounded.Lightbulb, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Rounded.Lightbulb, contentDescription = null, tint = Color.White, modifier = Modifier.size(if (isSmallScreen) 20.dp else 24.dp))
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text("Günün AI Tavsiyesi", fontWeight = FontWeight.Black, fontSize = 15.sp, color = Color(0xFF6C5CE7))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Günün AI Tavsiyesi", fontWeight = FontWeight.Black, fontSize = if (isSmallScreen) 14.sp else 15.sp, color = Color(0xFF6C5CE7))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "Domatesleriniz bu hafta yüksek UV'den stres yapabilir. Sulamayı %10 artırmanızı öneririz.",
@@ -620,10 +628,9 @@ fun HomeDashboard(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(if (isSmallScreen) 24.dp else 32.dp))
 
-        // --- SECTION 5: ENVIRONMENTAL MONITORING (IoT / Weather) ---
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+        Column(modifier = Modifier.padding(horizontal = if (isSmallScreen) 16.dp else 24.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -676,7 +683,7 @@ fun HomeDashboard(
             }
         }
 
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(modifier = Modifier.height(if (isSmallScreen) 80.dp else 120.dp))
     }
 }
 
@@ -777,7 +784,6 @@ fun ProfileDashboard(authViewModel: AuthViewModel, onNavigateToSettings: () -> U
     ) {
         Spacer(modifier = Modifier.height(48.dp))
         
-        // Profile Avatar
         Box(
             modifier = Modifier
                 .size(130.dp)
@@ -850,7 +856,7 @@ fun ProfileDashboard(authViewModel: AuthViewModel, onNavigateToSettings: () -> U
                         .background(Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Outlined.Logout, contentDescription = "Log Out", tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
+                    Icon(Icons.AutoMirrored.Outlined.Logout, contentDescription = "Log Out", tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
@@ -862,7 +868,7 @@ fun ProfileDashboard(authViewModel: AuthViewModel, onNavigateToSettings: () -> U
             }
         }
         
-        Spacer(modifier = Modifier.height(120.dp)) // padding for bottom bar
+        Spacer(modifier = Modifier.height(120.dp))
     }
 }
 
@@ -885,6 +891,6 @@ fun SettingsRow(icon: ImageVector, title: String) {
         }
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = title, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
-        Text(text = "〉", color = TextSecondary, fontSize = 16.sp, fontWeight = FontWeight.Bold) // Simple arrow
+        Text(text = "〉", color = TextSecondary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
